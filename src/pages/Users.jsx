@@ -16,7 +16,8 @@ export default function Users() {
   }, [])
 
   const filtered = users.filter(u => 
-    u.name.toLowerCase().includes(search.toLowerCase())
+    u.name.toLowerCase().includes(search.toLowerCase())||
+    u.username.toLowerCase().includes(search.toLowerCase())
   )
 
   if (loading) return <p>Loading users...</p>
@@ -34,7 +35,7 @@ export default function Users() {
       <ul className="users-list">
         {filtered.map(u => (
           <li key={u.id} className="user-card">
-            <h3>{u.name}</h3>
+            <h3><Link to={`/users/${u.id}`}>{u.name}</Link></h3>
             <p><strong>@{u.username}</strong></p>
             <p>Email: {u.email}</p>
             <p>Phone: {u.phone}</p>
