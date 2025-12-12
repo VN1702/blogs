@@ -4,7 +4,7 @@ import Home from './pages/Home.jsx'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import Post from './pages/Post.jsx'
-import Posts from './pages/Posts.jsx'
+import Blogs from './pages/Blogs.jsx'
 import Users from './pages/Users.jsx'
 import './App.css'
 
