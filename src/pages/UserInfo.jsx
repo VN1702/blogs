@@ -21,15 +21,23 @@ export default function User() {
       })
       .then(userData => {
         setUser(userData)
-        return Promise.all([
-          fetch(`https://jsonplaceholder.typicode.com/users/${id}/posts`).then(r => r.json()),
-          fetch('https://jsonplaceholder.typicode.com/comments').then(r => r.json())
-        ]).then(([postsData, commentsData]) => {
-          setPosts(postsData || [])
-          const userComments = (commentsData || []).filter(c => c.email?.toLowerCase() === (userData.email || '').toLowerCase())
-          setComments(userComments)
-          setLoading(false)
-        })
+        return fetch(`https://jsonplaceholder.typicode.com/users/${id}/posts`).then(r => r.json())
+          .then(postsData => {
+            setPosts(postsData || [])
+            // If no posts, no comments on those posts
+            if (!postsData || postsData.length === 0) {
+              setComments([])
+              setLoading(false)
+              return
+            }
+            // Fetch comments for each post and flatten
+            return Promise.all(postsData.map(p => fetch(`https://jsonplaceholder.typicode.com/posts/${p.id}/comments`).then(r => r.json())))
+              .then(commentsArrays => {
+                const flat = (commentsArrays || []).flat()
+                setComments(flat)
+                setLoading(false)
+              })
+          })
       })
       .catch(err => {
         setError(err.message || 'Failed to load')
@@ -63,8 +71,8 @@ export default function User() {
       </section>
 
       <section style={{marginTop: 20}}>
-        <h3>Comments made by {user.name} ({comments.length})</h3>
-        {comments.length === 0 ? <p>No comments found</p> : (
+        <h3>Comments on posts by {user.name} ({comments.length})</h3>
+        {comments.length === 0 ? <p>No comments on their posts</p> : (
           <div>
             {comments.map(c => (
               <div key={c.id} className="comment" style={{marginBottom: 12}}>
